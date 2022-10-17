@@ -25,4 +25,10 @@ public class ResourceNotFoundException extends RuntimeException {
         this.fieldValue = fieldValue;
     }
 
+    public ResourceNotFoundException(String resourceName, String fieldValue) {
+        super(String.format("%s ya tiene un pestamo: %s ", resourceName, fieldValue));
+        this.resourceName = resourceName;
+        this.fieldValue = fieldValue;
+    }
+
 }

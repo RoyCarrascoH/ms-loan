@@ -4,17 +4,15 @@ import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.nttdata.bootcamp.msloan.application.LoanService;
+import com.nttdata.bootcamp.msloan.dto.LoanDto;
 import com.nttdata.bootcamp.msloan.model.Loan;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import javax.validation.Valid;
 
 @RestController
@@ -35,10 +33,10 @@ public class LoanController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Map<String, Object>>> saveLoan(@Valid @RequestBody Mono<Loan> monoLoan) {
+    public Mono<ResponseEntity<Map<String, Object>>> saveLoan(@Valid @RequestBody Mono<LoanDto> monoLoanDto) {
         Map<String, Object> request = new HashMap<>();
-        return monoLoan.flatMap(loan -> {
-            return service.save(loan).map(c -> {
+        return monoLoanDto.flatMap(loanDto -> {
+            return service.save(loanDto).map(c -> {
                 request.put("Prestamo", c);
                 request.put("mensaje", "Prestamo guardado con exito");
                 request.put("timestamp", new Date());
@@ -49,15 +47,14 @@ public class LoanController {
     }
 
     @PutMapping("/{idLoan}")
-    public Mono<ResponseEntity<Loan>> editLoan(@Valid @RequestBody Loan loan, @PathVariable("idLoan") String idLoan) {
-        return service.update(loan, idLoan)
+    public Mono<ResponseEntity<Loan>> editLoan(@Valid @RequestBody LoanDto loanDto, @PathVariable("idLoan") String idLoan) {
+        return service.update(loanDto, idLoan)
                 .map(c -> ResponseEntity.created(URI.create("/api/loans/".concat(idLoan)))
                         .contentType(MediaType.APPLICATION_JSON_UTF8).body(c));
     }
 
     @DeleteMapping("/{idLoan}")
     public Mono<ResponseEntity<Void>> deleteLoan(@PathVariable("idLoan") String idLoan) {
-        //return service.delete(idLoan).then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT)));
         return service.delete(idLoan)
                 .map(c -> ResponseEntity.created(URI.create("/api/loans/".concat(idLoan)))
                         .contentType(MediaType.APPLICATION_JSON_UTF8).body(c));

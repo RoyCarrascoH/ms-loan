@@ -1,5 +1,6 @@
 package com.nttdata.bootcamp.msloan.application;
 
+import com.nttdata.bootcamp.msloan.dto.LoanDto;
 import com.nttdata.bootcamp.msloan.model.Loan;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -10,9 +11,9 @@ public interface LoanService {
 
     public Mono<Loan> findById(String idLoan);
 
-    public Mono<Loan> save(Loan loan);
+    public Mono<Loan> save(LoanDto loanDto);
 
-    public Mono<Loan> update(Loan loan, String idLoan);
+    public Mono<Loan> update(LoanDto loanDto, String idLoan);
 
     public Mono<Void> delete(String idLoan);
 }
