@@ -42,6 +42,10 @@ public class LoanDto {
 
     private String status;
 
+    private Double amountOfDebt;
+
+    private Double balance;
+
     public Mono<Boolean> validateFields() {
         log.info("validateFields-------: " );
         return Mono.when(validateLoanType())
@@ -76,6 +80,7 @@ public class LoanDto {
                 .currency(this.getCurrency())
                 .numberQuotas(this.getNumberQuotas())
                 .status(this.getStatus())
+                .balance(this.getBalance())
                 .build();
         log.info("Fin MapperToLoan-------: " );
         return Mono.just(loan);

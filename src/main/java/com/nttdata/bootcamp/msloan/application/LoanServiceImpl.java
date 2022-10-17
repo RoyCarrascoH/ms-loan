@@ -71,6 +71,7 @@ public class LoanServiceImpl implements LoanService {
                                                     x.setCurrency(loanDto.getCurrency());
                                                     x.setNumberQuotas(loanDto.getNumberQuotas());
                                                     x.setStatus(loanDto.getStatus());
+                                                    x.setBalance(loanDto.getBalance());
                                                     return loanRepository.save(x);
                                                 });
                                     } else {
