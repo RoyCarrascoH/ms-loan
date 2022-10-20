@@ -16,4 +16,6 @@ public interface LoanService {
     public Mono<Loan> update(LoanDto loanDto, String idLoan);
 
     public Mono<Void> delete(String idLoan);
+
+    public Mono<LoanDto> findMovementsByDocumentNumber(String documentNumber);
 }

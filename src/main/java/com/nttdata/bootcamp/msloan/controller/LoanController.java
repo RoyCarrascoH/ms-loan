@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import com.nttdata.bootcamp.msloan.application.LoanService;
 import com.nttdata.bootcamp.msloan.dto.LoanDto;
 import com.nttdata.bootcamp.msloan.model.Loan;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import javax.validation.Valid;
 
 @RestController
@@ -58,6 +60,13 @@ public class LoanController {
         return service.delete(idLoan)
                 .map(c -> ResponseEntity.created(URI.create("/api/loans/".concat(idLoan)))
                         .contentType(MediaType.APPLICATION_JSON_UTF8).body(c));
+    }
+
+    @GetMapping("movements/documentNumber/{documentNumber}")
+    public Mono<ResponseEntity<LoanDto>> getMovementsOfLoanByDocumentNumber(@PathVariable("documentNumber") String documentNumber) {
+        return service.findMovementsByDocumentNumber(documentNumber)
+                .map(c -> ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(c))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
 

@@ -6,6 +6,7 @@ import com.nttdata.bootcamp.msloan.exception.ResourceNotFoundException;
 import com.nttdata.bootcamp.msloan.infrastructure.LoanRepository;
 import com.nttdata.bootcamp.msloan.model.Client;
 import com.nttdata.bootcamp.msloan.model.Loan;
+import com.nttdata.bootcamp.msloan.model.Movement;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,7 +36,7 @@ public class LoanServiceImpl implements LoanService {
     public Mono<Loan> save(LoanDto loanDto) {
 
         return findClientByDni(String.valueOf(loanDto.getDocumentNumber()))
-                        .flatMap(client -> {
+                .flatMap(client -> {
                     return validateNumberClientLoan(client, loanDto, "save").flatMap(o -> {
                         return loanDto.validateFields()
                                 .flatMap(at -> {
@@ -130,6 +131,39 @@ public class LoanServiceImpl implements LoanService {
         } else {
             return Mono.error(new ResourceNotFoundException("Tipo Cliente", "ClientType", client.getClientType()));
         }
+    }
+
+    @Override
+    public Mono<LoanDto> findMovementsByDocumentNumber(String documentNumber) {
+        log.info("Inicio----findMovementsByDocumentNumber-------: ");
+        log.info("Inicio----findMovementsByDocumentNumber-------documentNumber : " + documentNumber);
+        return loanRepository.findByDocumentNumber(documentNumber)
+                .flatMap(d -> {
+                    log.info("Inicio----findMovementsByCreditNumber-------: ");
+                    return findMovementsByLoanNumber(d.getLoanNumber().toString())
+                            .collectList()
+                            .flatMap(m -> {
+                                log.info("----findMovementsByLoanNumber setMovements-------: ");
+                                d.setMovements(m);
+                                return Mono.just(d);
+                            });
+                });
+    }
+
+    public Flux<Movement> findMovementsByLoanNumber(String loanNumber) {
+
+        log.info("Inicio----findMovementsByLoanNumber-------: ");
+        WebClientConfig webconfig = new WebClientConfig();
+        Flux<Movement> alerts = webconfig.setUriData("http://localhost:8083/")
+                .flatMap(d -> {
+                    return webconfig.getWebclient().get()
+                            .uri("/api/movements/client//loanNumber/" + loanNumber)
+                            .retrieve()
+                            .bodyToFlux(Movement.class)
+                            .collectList();
+                })
+                .flatMapMany(iterable -> Flux.fromIterable(iterable));
+        return alerts;
     }
 
 }
