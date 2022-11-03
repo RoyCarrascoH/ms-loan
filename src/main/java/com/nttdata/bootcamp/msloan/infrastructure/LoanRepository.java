@@ -14,4 +14,7 @@ public interface LoanRepository extends ReactiveMongoRepository<Loan, String> {
 
     @Query(value = "{'client.documentNumber' : ?0}")
     Mono<LoanDto> findByDocumentNumber(String documentNumber);
+
+    @Query(value = "{'client.documentNumber' : ?0}")
+    Flux<Loan> findByLoanOfDocumentNumber(String documentNumber);
 }

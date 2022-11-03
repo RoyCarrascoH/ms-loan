@@ -1,17 +1,21 @@
 package com.nttdata.bootcamp.msloan.application;
 
-import com.nttdata.bootcamp.msloan.config.WebClientConfig;
 import com.nttdata.bootcamp.msloan.dto.LoanDto;
 import com.nttdata.bootcamp.msloan.exception.ResourceNotFoundException;
+import com.nttdata.bootcamp.msloan.infrastructure.ClientRepository;
+import com.nttdata.bootcamp.msloan.infrastructure.CreditRepository;
 import com.nttdata.bootcamp.msloan.infrastructure.LoanRepository;
+import com.nttdata.bootcamp.msloan.infrastructure.MovementRepository;
 import com.nttdata.bootcamp.msloan.model.Client;
 import com.nttdata.bootcamp.msloan.model.Loan;
-import com.nttdata.bootcamp.msloan.model.Movement;
+import com.nttdata.bootcamp.msloan.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -19,6 +23,15 @@ public class LoanServiceImpl implements LoanService {
 
     @Autowired
     private LoanRepository loanRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private MovementRepository movementRepository;
+
+    @Autowired
+    private CreditRepository creditRepository;
 
     @Override
     public Flux<Loan> findAll() {
@@ -35,28 +48,30 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public Mono<Loan> save(LoanDto loanDto) {
 
-        return findClientByDni(String.valueOf(loanDto.getDocumentNumber()))
+        return clientRepository.findClientByDni(String.valueOf(loanDto.getDocumentNumber()))
                 .flatMap(client -> {
-                    return validateNumberClientLoan(client, loanDto, "save").flatMap(o -> {
-                        return loanDto.validateFields()
-                                .flatMap(at -> {
-                                    if (at.equals(true)) {
-                                        return loanDto.mapperToLoan(client)
-                                                .flatMap(ba -> {
-                                                    log.info("sg MapperToLoan-------: ");
-                                                    return loanRepository.save(ba);
-                                                });
-                                    } else {
-                                        return Mono.error(new ResourceNotFoundException("Tipo Prestamo", "LoanType", loanDto.getLoanType()));
-                                    }
-                                });
-                    });
+                    return validateNumberClientLoan(client, loanDto, "save")
+                            .flatMap(o -> {
+                                log.info("sg validateNumberClientLoan-------: " + o.toString());
+                                return loanDto.validateFields()
+                                        .flatMap(at -> {
+                                            if (at.equals(true)) {
+                                                return loanDto.mapperToLoan(client)
+                                                        .flatMap(ba -> {
+                                                            log.info("sg MapperToLoan-------: ");
+                                                            return loanRepository.save(ba);
+                                                        });
+                                            } else {
+                                                return Mono.error(new ResourceNotFoundException("Tipo Prestamo", "LoanType", loanDto.getLoanType()));
+                                            }
+                                        });
+                            });
                 });
     }
 
     @Override
     public Mono<Loan> update(LoanDto loanDto, String idLoan) {
-        return findClientByDni(String.valueOf(loanDto.getDocumentNumber()))
+        return clientRepository.findClientByDni(String.valueOf(loanDto.getDocumentNumber()))
                 .flatMap(client -> {
                     return validateNumberClientLoan(client, loanDto, "update").flatMap(o -> {
                         return loanDto.validateFields()
@@ -72,7 +87,10 @@ public class LoanServiceImpl implements LoanService {
                                                     x.setCurrency(loanDto.getCurrency());
                                                     x.setNumberQuotas(loanDto.getNumberQuotas());
                                                     x.setStatus(loanDto.getStatus());
-                                                    x.setBalance(loanDto.getBalance());
+                                                    x.setDebtBalance(loanDto.getDebtBalance());
+                                                    x.setDisbursementDate(loanDto.getDisbursementDate());
+                                                    x.setPaymentDate(loanDto.getPaymentDate());
+                                                    x.setExpirationDate(loanDto.getExpirationDate());
                                                     return loanRepository.save(x);
                                                 });
                                     } else {
@@ -90,14 +108,6 @@ public class LoanServiceImpl implements LoanService {
                 .flatMap(loanRepository::delete);
     }
 
-    public Mono<Client> findClientByDni(String documentNumber) {
-        WebClientConfig webconfig = new WebClientConfig();
-        return webconfig.setUriData("http://localhost:8080/").flatMap(
-                d -> {
-                    return webconfig.getWebclient().get().uri("/api/clients/documentNumber/" + documentNumber).retrieve().bodyToMono(Client.class);
-                }
-        );
-    }
 
     public Mono<Boolean> validateNumberClientLoan(Client client, LoanDto loanDto, String method) {
         log.info("Inicio validateNumberClientLoan-------: ");
@@ -112,7 +122,14 @@ public class LoanServiceImpl implements LoanService {
                         return Mono.error(new ResourceNotFoundException("Cliente ", client.getClientType()));
                     } else {
                         log.info("3 Personal cantidad : ", cant);
-                        return Mono.just(true);
+                        log.info("Cliente Personal no tiene prestamo");
+                        return validateLoanDebt(client.getDocumentNumber(), "Personal").flatMap(vl ->{
+                            if (vl.equals(true)){
+                                return validateCreditCardDebt(client.getDocumentNumber(), "Personal");
+                            }else{
+                                return Mono.just(false);
+                            }
+                        });
                     }
                 });
             } else {
@@ -123,7 +140,16 @@ public class LoanServiceImpl implements LoanService {
                 Flux<Loan> list = loanRepository.findByLoanClient(client.getDocumentNumber(), loanDto.getLoanType());
                 return list.count().flatMap(cant -> {
                     log.info("1 Business cantidad : ", cant);
-                    return Mono.just(true);
+
+                    return validateLoanDebt(client.getDocumentNumber(), "Business").flatMap( vl ->{
+                        if (vl.equals(true)){
+                            return validateCreditCardDebt(client.getDocumentNumber(), "Business");
+                        }else{
+                            return Mono.just(false);
+                        }
+                    });
+
+
                 });
             } else {
                 return Mono.just(true);
@@ -140,7 +166,9 @@ public class LoanServiceImpl implements LoanService {
         return loanRepository.findByDocumentNumber(documentNumber)
                 .flatMap(d -> {
                     log.info("Inicio----findMovementsByCreditNumber-------: ");
-                    return findMovementsByLoanNumber(d.getLoanNumber().toString())
+                    log.info("Inicio----findMovementsByCreditNumber-------: " + d.toString());
+                    log.info("Inicio----findMovementsByCreditNumber-------: " + d.getLoanNumber().toString() );
+                    return movementRepository.findMovementsByLoanNumber(d.getLoanNumber().toString())
                             .collectList()
                             .flatMap(m -> {
                                 log.info("----findMovementsByLoanNumber setMovements-------: ");
@@ -150,20 +178,86 @@ public class LoanServiceImpl implements LoanService {
                 });
     }
 
-    public Flux<Movement> findMovementsByLoanNumber(String loanNumber) {
+    @Override
+    public Flux<Loan> findLoanByDocumentNumber(String documentNumber) {
+        log.info("Inicio----findLoanByDocumentNumber-------: ");
+        log.info("Inicio----findLoanByDocumentNumber-------documentNumber : " + documentNumber);
+        return loanRepository.findByLoanOfDocumentNumber(documentNumber);
+    }
 
-        log.info("Inicio----findMovementsByLoanNumber-------: ");
-        WebClientConfig webconfig = new WebClientConfig();
-        Flux<Movement> alerts = webconfig.setUriData("http://localhost:8083/")
-                .flatMap(d -> {
-                    return webconfig.getWebclient().get()
-                            .uri("/api/movements/client//loanNumber/" + loanNumber)
-                            .retrieve()
-                            .bodyToFlux(Movement.class)
-                            .collectList();
-                })
-                .flatMapMany(iterable -> Flux.fromIterable(iterable));
-        return alerts;
+    //Si tiene deuda return false sino true
+    public Mono<Boolean> validateCreditCardDebt(String documentNumber, String creditType) {
+
+        log.info("Inicio----validateCreditCardDebt-------: ");
+        log.info("Inicio----validateCreditCardDebt-------documentNumber : " + documentNumber);
+        LocalDateTime datetime = LocalDateTime.now();
+        return creditRepository.findCreditsByDocumentNumber(documentNumber)
+                .collectList()
+                .flatMap(c -> {
+                    log.info("sg----findCreditsByDocumentNumber-------: ");
+                    log.info("sg----findCreditsByDocumentNumber-------: " + c.toString());
+                    if (creditType.equals("Personal")) {
+                        if (c.size() == Constants.ZERO || c == null) {
+                            log.info("Inicio----validateCreditCardDebt-------if1: ");
+                            return Mono.just(true);
+                        } else {
+                            log.info("Inicio----validateCreditCardDebt-------else1: ");
+                            if (datetime.isBefore(c.get(0).getExpirationDate())) {
+                                log.info("Inicio----validateCreditCardDebt-------if2: ");
+                                return Mono.just(true);//No se vence
+                            } else {
+                                log.info("Inicio----validateCreditCardDebt-------else2: ");
+                                return Mono.just(false);//Ya se vencio
+                            }
+                        }
+                    } else if (creditType.equals("Business")) {
+                        if (c == null) {
+                            return Mono.just(true);
+                        } else {
+                            if (datetime.isBefore(c.get(0).getExpirationDate())) {
+                                return Mono.just(true);//No se vence
+                            } else {
+                                return Mono.just(false);//Ya se vencio
+                            }
+                        }
+                    }else{
+                        return Mono.just(false);
+                    }
+                });
+    }
+
+    //Si tiene deuda retorna false
+    public Mono<Boolean> validateLoanDebt(String documentNumber, String loanType) {
+
+        log.info("Inicio----validateLoanDebt-------: ");
+        log.info("Inicio----validateLoanDebt-------documentNumber : " + documentNumber);
+        LocalDateTime datetime = LocalDateTime.now();
+        return loanRepository.findByLoanOfDocumentNumber(documentNumber)
+                .collectList()
+                .flatMap(l -> {
+                    if (loanType.equals("Personal")) {
+                        if (l.size() == Constants.ZERO || l == null) {
+                            return Mono.just(true);
+                        } else {
+                            if (datetime.isBefore(l.get(0).getExpirationDate())) {
+                                return Mono.just(true);//No se vence
+                            } else {
+                                return Mono.just(false);//Ya se vencio
+                            }
+                        }
+                    } else if (loanType.equals("Business")) {
+                        if (l == null) {
+                            return Mono.just(true);
+                        } else {
+                            if (datetime.isBefore(l.get(0).getExpirationDate())) {
+                                return Mono.just(true);//No se vence
+                            } else {
+                                return Mono.just(false);//Ya se vencio
+                            }
+                        }
+                    }
+                    return Mono.just(true);
+                });
     }
 
 }

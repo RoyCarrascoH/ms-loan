@@ -18,4 +18,6 @@ public interface LoanService {
     public Mono<Void> delete(String idLoan);
 
     public Mono<LoanDto> findMovementsByDocumentNumber(String documentNumber);
+
+    public Flux<Loan> findLoanByDocumentNumber(String documentNumber);
 }

@@ -8,11 +8,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,6 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @Slf4j
 @Builder
+@ToString
 public class LoanDto {
 
     private String idLoan;
@@ -44,9 +47,15 @@ public class LoanDto {
 
     private String status;
 
-    private Double amountOfDebt;
+    //private Double amountOfDebt;
 
-    private Double balance;
+    private Double debtBalance;
+
+    private LocalDateTime disbursementDate;
+
+    private LocalDateTime paymentDate;
+
+    private LocalDateTime expirationDate;
 
     private List<Movement> movements;
 
@@ -76,7 +85,7 @@ public class LoanDto {
     public Mono<Loan> mapperToLoan(Client client) {
         log.info("Inicio MapperToLoan-------: " );
         Loan loan = Loan.builder()
-                .idLoan(this.getIdLoan())
+                //.idLoan(this.getIdLoan())
                 .client(client)
                 .loanNumber(this.getLoanNumber())
                 .loanType(this.getLoanType())
@@ -84,7 +93,10 @@ public class LoanDto {
                 .currency(this.getCurrency())
                 .numberQuotas(this.getNumberQuotas())
                 .status(this.getStatus())
-                .balance(this.getBalance())
+                .debtBalance(this.getDebtBalance())
+                .disbursementDate(this.getDisbursementDate())
+                .paymentDate(this.getPaymentDate())
+                .expirationDate(this.getExpirationDate())
                 .build();
         log.info("Fin MapperToLoan-------: " );
         return Mono.just(loan);
