@@ -31,7 +31,7 @@ public class Loan {
     private String loanType;
 
     @NotNull(message = "no debe estar nulo")
-    private Double loanAmount; //5000
+    private Double loanAmount;
 
     @NotEmpty(message = "no debe estar vacío")
     private String currency;
