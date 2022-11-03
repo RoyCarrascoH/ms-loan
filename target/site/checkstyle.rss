@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>ms-loan - Checkstyle report</title>
+    <link>https://spring.io/projects/spring-boot/ms-loan</link>
+    <description>ms-loan - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2022</copyright>
+    <item>
+      <title>File: 20,
+             Errors: 8,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://spring.io/projects/spring-boot/ms-loan/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.infrastructure.ClientRepository.java">com/nttdata/bootcamp/msloan/infrastructure/ClientRepository.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.MsLoanApplication.java">com/nttdata/bootcamp/msloan/MsLoanApplication.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.controller.LoanController.java">com/nttdata/bootcamp/msloan/controller/LoanController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.infrastructure.MovementRepository.java">com/nttdata/bootcamp/msloan/infrastructure/MovementRepository.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.exception.BlogAppException.java">com/nttdata/bootcamp/msloan/exception/BlogAppException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.dto.LoanDto.java">com/nttdata/bootcamp/msloan/dto/LoanDto.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.exception.GlobalExceptionHandler.java">com/nttdata/bootcamp/msloan/exception/GlobalExceptionHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.infrastructure.LoanRepository.java">com/nttdata/bootcamp/msloan/infrastructure/LoanRepository.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.application.LoanService.java">com/nttdata/bootcamp/msloan/application/LoanService.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.util.Constants.java">com/nttdata/bootcamp/msloan/util/Constants.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.exception.ResourceNotFoundException.java">com/nttdata/bootcamp/msloan/exception/ResourceNotFoundException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.infrastructure.CreditRepository.java">com/nttdata/bootcamp/msloan/infrastructure/CreditRepository.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.model.Client.java">com/nttdata/bootcamp/msloan/model/Client.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.application.LoanServiceImpl.java">com/nttdata/bootcamp/msloan/application/LoanServiceImpl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.config.WebClientConfig.java">com/nttdata/bootcamp/msloan/config/WebClientConfig.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.producer.LoanProducer.java">com/nttdata/bootcamp/msloan/producer/LoanProducer.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.dto.ErrorDetail.java">com/nttdata/bootcamp/msloan/dto/ErrorDetail.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.model.Movement.java">com/nttdata/bootcamp/msloan/model/Movement.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.model.Credit.java">com/nttdata/bootcamp/msloan/model/Credit.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://spring.io/projects/spring-boot/ms-loan/checkstyle.html#com.nttdata.bootcamp.msloan.model.Loan.java">com/nttdata/bootcamp/msloan/model/Loan.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

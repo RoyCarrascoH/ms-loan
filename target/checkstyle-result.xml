@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="5.6">
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\application\LoanService.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\application\LoanServiceImpl.java">
+<error line="50" column="5" severity="error" message="Ocurrió una excepción - expecting EOF, found &apos;}&apos;" source="com.puppycrawl.tools.checkstyle.TreeWalker"/>
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\config\WebClientConfig.java">
+<error line="24" column="25" severity="error" message="Ocurrió una excepción - expecting EOF, found &apos;setUrl&apos;" source="com.puppycrawl.tools.checkstyle.TreeWalker"/>
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\controller\LoanController.java">
+<error line="35" column="5" severity="error" message="Ocurrió una excepción - expecting EOF, found &apos;}&apos;" source="com.puppycrawl.tools.checkstyle.TreeWalker"/>
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\dto\ErrorDetail.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\dto\LoanDto.java">
+<error line="72" column="13" severity="error" message="Ocurrió una excepción - expecting EOF, found &apos;if&apos;" source="com.puppycrawl.tools.checkstyle.TreeWalker"/>
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\exception\BlogAppException.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\exception\GlobalExceptionHandler.java">
+<error line="27" column="13" severity="error" message="Ocurrió una excepción - expecting EOF, found &apos;return&apos;" source="com.puppycrawl.tools.checkstyle.TreeWalker"/>
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\exception\ResourceNotFoundException.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\infrastructure\ClientRepository.java">
+<error line="34" column="5" severity="error" message="Ocurrió una excepción - expecting EOF, found &apos;}&apos;" source="com.puppycrawl.tools.checkstyle.TreeWalker"/>
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\infrastructure\CreditRepository.java">
+<error line="41" column="9" severity="error" message="Ocurrió una excepción - expecting EOF, found &apos;return&apos;" source="com.puppycrawl.tools.checkstyle.TreeWalker"/>
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\infrastructure\LoanRepository.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\infrastructure\MovementRepository.java">
+<error line="39" column="5" severity="error" message="Ocurrió una excepción - expecting EOF, found &apos;}&apos;" source="com.puppycrawl.tools.checkstyle.TreeWalker"/>
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\model\Client.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\model\Credit.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\model\Loan.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\model\Movement.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\MsLoanApplication.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\producer\LoanProducer.java">
+</file>
+<file name="C:\Informacion Empresarial\Repositorio GitHub\ms-loan\src\main\java\com\nttdata\bootcamp\msloan\util\Constants.java">
+</file>
+</checkstyle>
