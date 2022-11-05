@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Loan.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-loan</a> &gt; <a href="index.source.html" class="el_package">com.nttdata.bootcamp.msloan.model</a> &gt; <span class="el_source">Loan.java</span></div><h1>Loan.java</h1><pre class="source lang-java linenums">package com.nttdata.bootcamp.msloan.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.LocalDateTime;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * Class Loan model.
+ * Loan microservice class Loan.
+ */
+@Document(collection = &quot;Loan&quot;)
+@Getter
+<span class="nc" id="L20">@Setter</span>
+<span class="nc" id="L21">@AllArgsConstructor</span>
+<span class="nc" id="L22">@NoArgsConstructor</span>
+<span class="nc" id="L23">@Builder</span>
+public class Loan {
+
+    @Id
+<span class="nc" id="L27">    private String idLoan;</span>
+
+<span class="nc" id="L29">    private Client client;</span>
+
+    @NotNull(message = &quot;no debe estar nulo&quot;)
+<span class="nc" id="L32">    private Integer loanNumber;</span>
+
+    @NotEmpty(message = &quot;no debe estar vacío&quot;)
+<span class="nc" id="L35">    private String loanType;</span>
+
+    @NotNull(message = &quot;no debe estar nulo&quot;)
+<span class="nc" id="L38">    private Double loanAmount;</span>
+
+    @NotEmpty(message = &quot;no debe estar vacío&quot;)
+<span class="nc" id="L41">    private String currency;</span>
+
+    @NotNull(message = &quot;no debe estar nulo&quot;)
+<span class="nc" id="L44">    private Integer numberQuotas;</span>
+
+<span class="nc" id="L46">    private String status;</span>
+
+<span class="nc" id="L48">    private Double debtBalance;</span>
+
+<span class="nc" id="L50">    private LocalDateTime disbursementDate;</span>
+
+<span class="nc" id="L52">    private LocalDateTime paymentDate;</span>
+
+<span class="nc" id="L54">    private LocalDateTime expirationDate;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

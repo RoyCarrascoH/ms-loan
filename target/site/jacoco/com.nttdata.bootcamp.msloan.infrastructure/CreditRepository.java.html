@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreditRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-loan</a> &gt; <a href="index.source.html" class="el_package">com.nttdata.bootcamp.msloan.infrastructure</a> &gt; <span class="el_source">CreditRepository.java</span></div><h1>CreditRepository.java</h1><pre class="source lang-java linenums">package com.nttdata.bootcamp.msloan.infrastructure;
+
+import com.nttdata.bootcamp.msloan.config.WebClientConfig;
+import com.nttdata.bootcamp.msloan.model.Credit;
+import com.nttdata.bootcamp.msloan.util.Constants;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Repository
+<span class="fc" id="L17">@Slf4j</span>
+<span class="fc" id="L18">public class CreditRepository {</span>
+
+    @Value(&quot;${local.property.host.ms-credits}&quot;)
+    private String propertyHostMsCredits;
+
+    @Autowired
+    ReactiveCircuitBreakerFactory reactiveCircuitBreakerFactory;
+
+    @CircuitBreaker(name = Constants.CREDIT_CB, fallbackMethod = &quot;getDefaultCreditsByDocumentNumber&quot;)
+    public Flux&lt;Credit&gt; findCreditsByDocumentNumber(String documentNumber) {
+
+<span class="nc" id="L29">        log.info(&quot;Inicio----findCreditsByDocumentNumber-------: &quot;);</span>
+<span class="nc" id="L30">        WebClientConfig webconfig = new WebClientConfig();</span>
+<span class="nc" id="L31">        Flux&lt;Credit&gt; alerts = webconfig.setUriData(&quot;http://&quot; + propertyHostMsCredits + &quot;:8084&quot;)</span>
+<span class="nc" id="L32">                .flatMap(d -&gt; webconfig.getWebclient().get()</span>
+<span class="nc" id="L33">                        .uri(&quot;/api/credits/creditsDetails/&quot; + documentNumber).retrieve()</span>
+<span class="nc" id="L34">                        .onStatus(HttpStatus::is4xxClientError, clientResponse -&gt; Mono.error(new Exception(&quot;Error 400&quot;)))</span>
+<span class="nc" id="L35">                        .onStatus(HttpStatus::is5xxServerError, clientResponse -&gt; Mono.error(new Exception(&quot;Error 500&quot;)))</span>
+<span class="nc" id="L36">                        .bodyToFlux(Credit.class)</span>
+                        // .transform(it -&gt; reactiveCircuitBreakerFactory.create(&quot;parameter-service&quot;).run(it, throwable -&gt; Flux.just(new Credit())))
+<span class="nc" id="L38">                        .collectList()</span>
+                )
+<span class="nc" id="L40">                .flatMapMany(iterable -&gt; Flux.fromIterable(iterable));</span>
+<span class="nc" id="L41">        return alerts;</span>
+    }
+
+    public Flux&lt;Credit&gt; getDefaultCreditsByDocumentNumber(String documentNumber, Exception e) {
+<span class="nc" id="L45">        log.info(&quot;Inicio----getDefaultCreditsByDocumentNumber-------: &quot;);</span>
+<span class="nc" id="L46">        return Flux.empty();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

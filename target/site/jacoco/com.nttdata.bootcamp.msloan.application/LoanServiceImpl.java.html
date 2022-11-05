@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoanServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-loan</a> &gt; <a href="index.source.html" class="el_package">com.nttdata.bootcamp.msloan.application</a> &gt; <span class="el_source">LoanServiceImpl.java</span></div><h1>LoanServiceImpl.java</h1><pre class="source lang-java linenums">package com.nttdata.bootcamp.msloan.application;
+
+import com.nttdata.bootcamp.msloan.dto.LoanDto;
+import com.nttdata.bootcamp.msloan.exception.ResourceNotFoundException;
+import com.nttdata.bootcamp.msloan.infrastructure.ClientRepository;
+import com.nttdata.bootcamp.msloan.infrastructure.CreditRepository;
+import com.nttdata.bootcamp.msloan.infrastructure.LoanRepository;
+import com.nttdata.bootcamp.msloan.infrastructure.MovementRepository;
+import com.nttdata.bootcamp.msloan.model.Client;
+import com.nttdata.bootcamp.msloan.model.Loan;
+import com.nttdata.bootcamp.msloan.producer.LoanProducer;
+import com.nttdata.bootcamp.msloan.util.Constants;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
+
+@Service
+<span class="fc" id="L22">@Slf4j</span>
+<span class="fc" id="L23">public class LoanServiceImpl implements LoanService {</span>
+
+    @Autowired
+    private LoanRepository loanRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private MovementRepository movementRepository;
+
+    @Autowired
+    private CreditRepository creditRepository;
+
+    @Autowired
+    private LoanProducer loanProducer;
+
+    @Override
+    public Flux&lt;Loan&gt; findAll() {
+<span class="nc" id="L42">        return loanRepository.findAll();</span>
+    }
+
+    @Override
+    public Mono&lt;Loan&gt; findById(String idLoan) {
+<span class="nc" id="L47">        return Mono.just(idLoan)</span>
+<span class="nc" id="L48">                .flatMap(loanRepository::findById)</span>
+<span class="nc" id="L49">                .switchIfEmpty(Mono.error(new ResourceNotFoundException(&quot;Prestamo&quot;, &quot;IdPrestamo&quot;, idLoan)));</span>
+    }
+
+    @Override
+    public Mono&lt;Loan&gt; save(LoanDto loanDto) {
+
+<span class="nc" id="L55">        return clientRepository.findClientByDni(String.valueOf(loanDto.getDocumentNumber()))</span>
+<span class="nc" id="L56">                .flatMap(client -&gt; {</span>
+<span class="nc" id="L57">                    return validateNumberClientLoan(client, loanDto, &quot;save&quot;)</span>
+<span class="nc" id="L58">                            .flatMap(o -&gt; {</span>
+<span class="nc" id="L59">                                log.info(&quot;sg validateNumberClientLoan-------: &quot; + o.toString());</span>
+<span class="nc" id="L60">                                return loanDto.validateFields()</span>
+<span class="nc" id="L61">                                        .flatMap(at -&gt; {</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                                            if (at.equals(true)) {</span>
+<span class="nc" id="L63">                                                return loanDto.mapperToLoan(client)</span>
+<span class="nc" id="L64">                                                        .flatMap(ba -&gt; {</span>
+<span class="nc" id="L65">                                                            log.info(&quot;sg MapperToLoan-------: &quot;);</span>
+<span class="nc" id="L66">                                                            return loanRepository.save(ba)</span>
+<span class="nc" id="L67">                                                                    .flatMap(k -&gt; {</span>
+<span class="nc" id="L68">                                                                        loanProducer.sendMessage(k);</span>
+<span class="nc" id="L69">                                                                        return Mono.just(k);</span>
+                                                                    });
+                                                        });
+                                            } else {
+<span class="nc" id="L73">                                                return Mono.error(new ResourceNotFoundException(&quot;Tipo Prestamo&quot;, &quot;LoanType&quot;, loanDto.getLoanType()));</span>
+                                            }
+                                        });
+                            });
+                });
+    }
+
+    @Override
+    public Mono&lt;Loan&gt; update(LoanDto loanDto, String idLoan) {
+<span class="nc" id="L82">        return clientRepository.findClientByDni(String.valueOf(loanDto.getDocumentNumber()))</span>
+<span class="nc" id="L83">                .flatMap(client -&gt; {</span>
+<span class="nc" id="L84">                    return validateNumberClientLoan(client, loanDto, &quot;update&quot;).flatMap(o -&gt; {</span>
+<span class="nc" id="L85">                        return loanDto.validateFields()</span>
+<span class="nc" id="L86">                                .flatMap(at -&gt; {</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                                    if (at.equals(true)) {</span>
+<span class="nc" id="L88">                                        return loanRepository.findById(idLoan)</span>
+<span class="nc" id="L89">                                                .switchIfEmpty(Mono.error(new ResourceNotFoundException(&quot;Prestamo&quot;, &quot;idLoan&quot;, idLoan)))</span>
+<span class="nc" id="L90">                                                .flatMap(x -&gt; {</span>
+<span class="nc" id="L91">                                                    x.setClient(client);</span>
+<span class="nc" id="L92">                                                    x.setLoanNumber(loanDto.getLoanNumber());</span>
+<span class="nc" id="L93">                                                    x.setLoanType(loanDto.getLoanType());</span>
+<span class="nc" id="L94">                                                    x.setLoanAmount(loanDto.getLoanAmount());</span>
+<span class="nc" id="L95">                                                    x.setCurrency(loanDto.getCurrency());</span>
+<span class="nc" id="L96">                                                    x.setNumberQuotas(loanDto.getNumberQuotas());</span>
+<span class="nc" id="L97">                                                    x.setStatus(loanDto.getStatus());</span>
+<span class="nc" id="L98">                                                    x.setDebtBalance(loanDto.getDebtBalance());</span>
+<span class="nc" id="L99">                                                    x.setDisbursementDate(loanDto.getDisbursementDate());</span>
+<span class="nc" id="L100">                                                    x.setPaymentDate(loanDto.getPaymentDate());</span>
+<span class="nc" id="L101">                                                    x.setExpirationDate(loanDto.getExpirationDate());</span>
+<span class="nc" id="L102">                                                    return loanRepository.save(x);</span>
+                                                });
+                                    } else {
+<span class="nc" id="L105">                                        return Mono.error(new ResourceNotFoundException(&quot;Tipo Prestamo&quot;, &quot;LoanType&quot;, loanDto.getLoanType()));</span>
+                                    }
+                                });
+                    });
+                });
+    }
+
+    @Override
+    public Mono&lt;Void&gt; delete(String idLoan) {
+<span class="nc" id="L114">        return loanRepository.findById(idLoan)</span>
+<span class="nc" id="L115">                .switchIfEmpty(Mono.error(new ResourceNotFoundException(&quot;Prestamo&quot;, &quot;IdLoan&quot;, idLoan)))</span>
+<span class="nc" id="L116">                .flatMap(loanRepository::delete);</span>
+    }
+
+
+    public Mono&lt;Boolean&gt; validateNumberClientLoan(Client client, LoanDto loanDto, String method) {
+<span class="nc" id="L121">        log.info(&quot;Inicio validateNumberClientLoan-------: &quot;);</span>
+<span class="nc" id="L122">        Boolean isOk = false;</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (client.getClientType().equals(&quot;Personal&quot;)) {</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">            if (method.equals(&quot;save&quot;)) {</span>
+<span class="nc" id="L125">                Flux&lt;Loan&gt; list = loanRepository.findByLoanClient(client.getDocumentNumber(), loanDto.getLoanType());</span>
+<span class="nc" id="L126">                return list.count().flatMap(cant -&gt; {</span>
+<span class="nc" id="L127">                    log.info(&quot;1 Personal cantidad : &quot;, cant);</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">                    if (cant &gt;= 1) {</span>
+<span class="nc" id="L129">                        log.info(&quot;2 Personal cantidad : &quot;, cant);</span>
+<span class="nc" id="L130">                        return Mono.error(new ResourceNotFoundException(&quot;Cliente &quot;, client.getClientType()));</span>
+                    } else {
+<span class="nc" id="L132">                        log.info(&quot;3 Personal cantidad : &quot;, cant);</span>
+<span class="nc" id="L133">                        log.info(&quot;Cliente Personal no tiene prestamo&quot;);</span>
+<span class="nc" id="L134">                        return validateLoanDebt(client.getDocumentNumber(), &quot;Personal&quot;).flatMap(vl -&gt; {</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">                            if (vl.equals(true)) {</span>
+<span class="nc" id="L136">                                return validateCreditCardDebt(client.getDocumentNumber(), &quot;Personal&quot;);</span>
+                            } else {
+<span class="nc" id="L138">                                return Mono.just(false);</span>
+                            }
+                        });
+                    }
+                });
+            } else {
+<span class="nc" id="L144">                return Mono.just(true);</span>
+            }
+<span class="nc bnc" id="L146" title="All 2 branches missed.">        } else if (client.getClientType().equals(&quot;Business&quot;)) {</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">            if (method.equals(&quot;save&quot;)) {</span>
+<span class="nc" id="L148">                Flux&lt;Loan&gt; list = loanRepository.findByLoanClient(client.getDocumentNumber(), loanDto.getLoanType());</span>
+<span class="nc" id="L149">                return list.count().flatMap(cant -&gt; {</span>
+<span class="nc" id="L150">                    log.info(&quot;1 Business cantidad : &quot;, cant);</span>
+<span class="nc" id="L151">                    return validateLoanDebt(client.getDocumentNumber(), &quot;Business&quot;).flatMap(vl -&gt; {</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">                        if (vl.equals(true)) {</span>
+<span class="nc" id="L153">                            return validateCreditCardDebt(client.getDocumentNumber(), &quot;Business&quot;);</span>
+                        } else {
+<span class="nc" id="L155">                            return Mono.just(false);</span>
+                        }
+                    });
+
+
+                });
+            } else {
+<span class="nc" id="L162">                return Mono.just(true);</span>
+            }
+        } else {
+<span class="nc" id="L165">            return Mono.error(new ResourceNotFoundException(&quot;Tipo Cliente&quot;, &quot;ClientType&quot;, client.getClientType()));</span>
+        }
+    }
+
+    @Override
+    public Mono&lt;LoanDto&gt; findMovementsByDocumentNumber(String documentNumber) {
+<span class="nc" id="L171">        log.info(&quot;Inicio----findMovementsByDocumentNumber-------: &quot;);</span>
+<span class="nc" id="L172">        log.info(&quot;Inicio----findMovementsByDocumentNumber-------documentNumber : &quot; + documentNumber);</span>
+<span class="nc" id="L173">        return loanRepository.findByDocumentNumber(documentNumber)</span>
+<span class="nc" id="L174">                .flatMap(d -&gt; {</span>
+<span class="nc" id="L175">                    log.info(&quot;Inicio----findMovementsByCreditNumber-------: &quot;);</span>
+<span class="nc" id="L176">                    log.info(&quot;Inicio----findMovementsByCreditNumber-------: &quot; + d.toString());</span>
+<span class="nc" id="L177">                    log.info(&quot;Inicio----findMovementsByCreditNumber-------: &quot; + d.getLoanNumber().toString());</span>
+<span class="nc" id="L178">                    return movementRepository.findMovementsByLoanNumber(d.getLoanNumber().toString())</span>
+<span class="nc" id="L179">                            .collectList()</span>
+<span class="nc" id="L180">                            .flatMap(m -&gt; {</span>
+<span class="nc" id="L181">                                log.info(&quot;----findMovementsByLoanNumber setMovements-------: &quot;);</span>
+<span class="nc" id="L182">                                d.setMovements(m);</span>
+<span class="nc" id="L183">                                return Mono.just(d);</span>
+                            });
+                });
+    }
+
+    @Override
+    public Flux&lt;Loan&gt; findLoanByDocumentNumber(String documentNumber) {
+<span class="nc" id="L190">        log.info(&quot;Inicio----findLoanByDocumentNumber-------: &quot;);</span>
+<span class="nc" id="L191">        log.info(&quot;Inicio----findLoanByDocumentNumber-------documentNumber : &quot; + documentNumber);</span>
+<span class="nc" id="L192">        return loanRepository.findByLoanOfDocumentNumber(documentNumber);</span>
+    }
+
+    //Si tiene deuda return false sino true
+    public Mono&lt;Boolean&gt; validateCreditCardDebt(String documentNumber, String creditType) {
+
+<span class="nc" id="L198">        log.info(&quot;Inicio----validateCreditCardDebt-------: &quot;);</span>
+<span class="nc" id="L199">        log.info(&quot;Inicio----validateCreditCardDebt-------documentNumber : &quot; + documentNumber);</span>
+<span class="nc" id="L200">        LocalDateTime datetime = LocalDateTime.now();</span>
+<span class="nc" id="L201">        return creditRepository.findCreditsByDocumentNumber(documentNumber)</span>
+<span class="nc" id="L202">                .collectList()</span>
+<span class="nc" id="L203">                .flatMap(c -&gt; {</span>
+<span class="nc" id="L204">                    log.info(&quot;sg----findCreditsByDocumentNumber-------: &quot;);</span>
+<span class="nc" id="L205">                    log.info(&quot;sg----findCreditsByDocumentNumber-------: &quot; + c.toString());</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">                    if (creditType.equals(&quot;Personal&quot;)) {</span>
+<span class="nc bnc" id="L207" title="All 4 branches missed.">                        if (c.size() == Constants.ZERO || c == null) {</span>
+<span class="nc" id="L208">                            log.info(&quot;Inicio----validateCreditCardDebt-------if1: &quot;);</span>
+<span class="nc" id="L209">                            return Mono.just(true);</span>
+                        } else {
+<span class="nc" id="L211">                            log.info(&quot;Inicio----validateCreditCardDebt-------else1: &quot;);</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">                            if (datetime.isBefore(c.get(0).getExpirationDate())) {</span>
+<span class="nc" id="L213">                                log.info(&quot;Inicio----validateCreditCardDebt-------if2: &quot;);</span>
+<span class="nc" id="L214">                                return Mono.just(true);//No se vence</span>
+                            } else {
+<span class="nc" id="L216">                                log.info(&quot;Inicio----validateCreditCardDebt-------else2: &quot;);</span>
+<span class="nc" id="L217">                                return Mono.just(false);//Ya se vencio</span>
+                            }
+                        }
+<span class="nc bnc" id="L220" title="All 2 branches missed.">                    } else if (creditType.equals(&quot;Business&quot;)) {</span>
+<span class="nc bnc" id="L221" title="All 4 branches missed.">                        if (c == null || c.size() == 0) {</span>
+<span class="nc" id="L222">                            return Mono.just(true);</span>
+                        } else {
+<span class="nc bnc" id="L224" title="All 2 branches missed.">                            if (datetime.isBefore(c.get(0).getExpirationDate())) {</span>
+<span class="nc" id="L225">                                return Mono.just(true);//No se vence</span>
+                            } else {
+<span class="nc" id="L227">                                return Mono.just(false);//Ya se vencio</span>
+                            }
+                        }
+                    } else {
+<span class="nc" id="L231">                        return Mono.just(false);</span>
+                    }
+                });
+    }
+
+    //Si tiene deuda retorna false
+    public Mono&lt;Boolean&gt; validateLoanDebt(String documentNumber, String loanType) {
+
+<span class="nc" id="L239">        log.info(&quot;Inicio----validateLoanDebt-------: &quot;);</span>
+<span class="nc" id="L240">        log.info(&quot;Inicio----validateLoanDebt-------documentNumber : &quot; + documentNumber);</span>
+<span class="nc" id="L241">        LocalDateTime datetime = LocalDateTime.now();</span>
+<span class="nc" id="L242">        return loanRepository.findByLoanOfDocumentNumber(documentNumber)</span>
+<span class="nc" id="L243">                .collectList()</span>
+<span class="nc" id="L244">                .flatMap(l -&gt; {</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">                    if (loanType.equals(&quot;Personal&quot;)) {</span>
+<span class="nc bnc" id="L246" title="All 4 branches missed.">                        if (l.size() == Constants.ZERO || l == null) {</span>
+<span class="nc" id="L247">                            return Mono.just(true);</span>
+                        } else {
+<span class="nc bnc" id="L249" title="All 2 branches missed.">                            if (datetime.isBefore(l.get(0).getExpirationDate())) {</span>
+<span class="nc" id="L250">                                return Mono.just(true);//No se vence</span>
+                            } else {
+<span class="nc" id="L252">                                return Mono.just(false);//Ya se vencio</span>
+                            }
+                        }
+<span class="nc bnc" id="L255" title="All 2 branches missed.">                    } else if (loanType.equals(&quot;Business&quot;)) {</span>
+<span class="nc bnc" id="L256" title="All 4 branches missed.">                        if (l == null || l.size() == 0) {</span>
+<span class="nc" id="L257">                            return Mono.just(true);</span>
+                        } else {
+<span class="nc bnc" id="L259" title="All 2 branches missed.">                            if (datetime.isBefore(l.get(0).getExpirationDate())) {</span>
+<span class="nc" id="L260">                                return Mono.just(true);//No se vence</span>
+                            } else {
+<span class="nc" id="L262">                                return Mono.just(false);//Ya se vencio</span>
+                            }
+                        }
+                    }
+<span class="nc" id="L266">                    return Mono.just(true);</span>
+                });
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
